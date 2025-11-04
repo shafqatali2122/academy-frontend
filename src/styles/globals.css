@@ -1,0 +1,97 @@
+/* frontend/src/styles/globals.css */
+
+
+
+/* 1. Load Tailwind */
+
+@import "tailwindcss";
+
+
+
+/* 2. RTE Content */
+
+.rte-content h1 {
+
+    /* Makes H1 clearly large and bold, ensuring max difference from H2 (text-3xl) */
+
+    @apply text-5xl font-extrabold mt-10 mb-4 border-b pb-2 text-gray-900;
+
+}
+
+.rte-content h2 {
+
+  @apply text-3xl font-bold mt-8 mb-3 text-gray-800;
+
+}
+
+.rte-content h3 {
+
+  @apply text-2xl font-semibold mt-6 mb-2 text-gray-700;
+
+}
+
+.rte-content ul,
+
+.rte-content ol {
+
+  @apply ml-6 my-4 space-y-1;
+
+}
+
+.rte-content ul {
+
+  @apply list-disc;
+
+}
+
+.rte-content ol {
+
+  @apply list-decimal;
+
+}
+
+.rte-content p {
+
+  @apply my-3 leading-relaxed;
+
+}
+
+.rte-content blockquote {
+
+  @apply border-l-4 border-blue-400 pl-4 py-2 my-4 italic text-gray-600;
+
+}
+
+
+
+/* 3. Global Variables */
+
+:root {
+
+  --background: #ffffff;
+
+  --foreground: #171717;
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+  :root {
+
+    --background: #0a0a0a;
+
+    --foreground: #ededed;
+
+  }
+
+}
+
+body {
+
+  background: var(--background);
+
+  color: var(--foreground);
+
+  font-family: Arial, Helvetica, sans-serif;
+
+}
