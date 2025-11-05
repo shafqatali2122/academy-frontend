@@ -10,7 +10,8 @@ import {
     FaCommentDots, // <-- ADD THIS LINE (Needed for Counselling)
     FaFilePdf,
     FaTags,
-    FaHome      // <-- ADD THIS LINE (Needed for Materials)
+    FaHome,
+    FaUsers      // <-- ADD THIS LINE (Needed for Materials)
 } from 'react-icons/fa';
 import { useAuth } from '@/utils/context/AuthContext';
 
@@ -26,6 +27,8 @@ const Sidebar = () => {
         { name: 'Counselling', icon: FaCommentDots, href: '/admin/counselling' },
         { name: 'Materials', icon: FaFilePdf, href: '/admin/materials' },
         { name: 'Categories', icon: FaTags, href: '/admin/materials/categories' },
+        { name: 'Manage Users', icon: FaUsers, href: '/admin/users' },
+
         
     ];
 
