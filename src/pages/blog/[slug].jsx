@@ -1,4 +1,4 @@
-// frontend/src/pages/blog/[slug].jsx (FINAL UPDATED)
+// frontend/src/pages/blog/[slug].jsx (FINAL MERGED)
 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
@@ -6,10 +6,19 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import ShareButtons from '@/components/common/ShareButtons'; // <-- ALREADY PRESENT
 
+// --- 1. ADD THESE IMPORTS ---
+import { useAuth } from '@/utils/context/AuthContext';
+import Link from 'next/link';
+import { FaEdit } from 'react-icons/fa';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 const BlogDetailPage = ({ blog }) => {
     const router = useRouter();
+
+    // --- 3. GET THE USER FROM CONTEXT ---
+    const { user } = useAuth();
+    const canEdit = user && (user.role === 'admin' || user.role === 'content_manager');
 
     if (router.isFallback) {
         return <PublicLayout><div>Loading blog article...</div></PublicLayout>;
@@ -66,6 +75,21 @@ const BlogDetailPage = ({ blog }) => {
             
             <article className="max-w-4xl mx-auto px-4 py-12">
                 
+                {/* --- 4. ADD THE CONDITIONAL EDIT BUTTON --- */}
+                {canEdit && (
+                    <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-3 rounded-md mb-6 flex justify-between items-center">
+                        <div>
+                            <span className="font-bold">Admin View:</span> You can see this because you are an Admin or Content Manager.
+                        </div>
+                        <Link 
+                            href={`/admin/blogs/edit/${blog._id}`} 
+                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                            <FaEdit className="mr-2" /> Edit Post
+                        </Link>
+                    </div>
+                )}
+
                 {/* Article Header */}
                 <header className="mb-10 text-center">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
@@ -91,10 +115,10 @@ const BlogDetailPage = ({ blog }) => {
 
                 {/* Main Content Area */}
                 <div 
-                // NEW CLASS: rte-content ensures all the headings are properly styled
-                className="rte-content prose prose-lg max-w-none text-gray-700 mx-auto" 
-                dangerouslySetInnerHTML={{ __html: blog.content }} 
+                    className="rte-content prose prose-lg max-w-none text-gray-700 mx-auto" 
+                    dangerouslySetInnerHTML={{ __html: blog.content }} 
                 />
+                
                 {/* ✅ NEW: Share Buttons */}
                 <footer className="mt-10 pt-6 border-t border-gray-200">
                     <ShareButtons 
