@@ -139,7 +139,7 @@ const RegisterPage = () => {
                                 type="password"
                                 id="confirmPassword"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.g.target.value)}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm"
                             />
