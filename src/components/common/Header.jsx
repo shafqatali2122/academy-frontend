@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FaBars, FaTimes, FaUserCircle } from 'react-icons/fa';
-import { useAuth } from '@/utils/context/AuthContext'; // --- ADD THIS ---
+import { useAuth } from '@/utils/context/AuthContext';
 
 const Header = () => {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
-    const { user, logout } = useAuth(); // --- ADD THIS ---
+    const { user, logout } = useAuth();
 
     const navItems = [
         { name: 'Home', path: '/' },
@@ -32,12 +32,19 @@ const Header = () => {
                 {/* Logo / Brand Name */}
                 <Link
                     href="/"
-                    className="text-2xl font-bold text-blue-700 hover:text-blue-900 transition-colors"
+                    className="flex items-center group"
                 >
-                    Shafqat Ali Academy
+                    {/* If you have a logo image later, uncomment this line: 
+                    <img src="/logo.png" alt="Al-Khalil Logo" className="h-10 w-auto mr-2" /> 
+                    */}
+                    
+                    {/* Text Logo Styling */}
+                    <span className="text-2xl font-extrabold text-blue-800 tracking-tight hover:text-blue-900 transition-colors">
+                        AL-KHALIL <span className="text-green-600">INSTITUTE</span>
+                    </span>
                 </Link>
 
-                {/* --- Desktop Nav (UPDATED) --- */}
+                {/* --- Desktop Nav --- */}
                 <div className="hidden md:flex items-center space-x-6">
                     {/* Main Nav Links */}
                     <nav className="flex space-x-6">
@@ -56,24 +63,24 @@ const Header = () => {
                         ))}
                     </nav>
 
-                    {/* --- NEW AUTH SECTION (DESKTOP) --- */}
+                    {/* --- AUTH SECTION (DESKTOP) --- */}
                     {user ? (
                         // User is LOGGED IN
-                        <div className="flex items-center space-x-4">
-                            <Link href="/my-dashboard" className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-                                <FaUserCircle className="mr-2" />
-                                My Dashboard
+                        <div className="flex items-center space-x-4 border-l pl-4 border-gray-300">
+                            <Link href={user.isAdmin ? "/admin/dashboard" : "/my-dashboard"} className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                                <FaUserCircle className="mr-2 text-lg" />
+                                Dashboard
                             </Link>
                             <button
                                 onClick={logout}
-                                className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                                className="text-sm font-medium text-red-600 hover:text-red-800"
                             >
                                 Logout
                             </button>
                         </div>
                     ) : (
                         // User is LOGGED OUT
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4 border-l pl-4 border-gray-300">
                             <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
                                 Login
                             </Link>
@@ -105,7 +112,7 @@ const Header = () => {
                 </button>
             </div>
 
-            {/* --- Mobile Dropdown Menu (UPDATED) --- */}
+            {/* --- Mobile Dropdown Menu --- */}
             {isOpen && (
                 <div className="md:hidden bg-white border-t border-gray-200 shadow-md">
                     <nav className="flex flex-col items-start p-4 space-y-3">
@@ -124,16 +131,16 @@ const Header = () => {
                             </Link>
                         ))}
 
-                        {/* --- NEW AUTH SECTION (MOBILE) --- */}
+                        {/* --- AUTH SECTION (MOBILE) --- */}
                         <div className="border-t border-gray-200 pt-4 mt-4 w-full space-y-3">
                             {user ? (
                                 <>
-                                    <Link href="/my-dashboard" onClick={() => setIsOpen(false)} className="block w-full font-medium text-gray-700 hover:text-blue-700">
+                                    <Link href={user.isAdmin ? "/admin/dashboard" : "/my-dashboard"} onClick={() => setIsOpen(false)} className="block w-full font-medium text-gray-700 hover:text-blue-700">
                                         My Dashboard
                                     </Link>
                                     <button
                                         onClick={handleMobileLogout}
-                                        className="block w-full text-left font-medium text-gray-700 hover:text-blue-700"
+                                        className="block w-full text-left font-medium text-red-600 hover:text-red-800"
                                     >
                                         Logout
                                     </button>
@@ -149,7 +156,6 @@ const Header = () => {
                                 </>
                             )}
                         </div>
-                        {/* --- END AUTH SECTION --- */}
 
                         <Link
                             href="/enroll"
