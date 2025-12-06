@@ -8,6 +8,10 @@ import { FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaPaperPlane } from 'react-icon
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+// Contact Details (Centralized for easy future update)
+const CONTACT_EMAIL = "info@alkhalilinstitute.org"; 
+const CONTACT_WHATSAPP = "923481631827"; 
+
 const ContactPage = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -26,15 +30,16 @@ const ContactPage = () => {
         }
 
         try {
-            // NOTE: We are using the main /enrollments endpoint as a catch-all for messages
+            // NOTE: Using the main /enrollments endpoint as a catch-all for messages
             await axios.post(`${API_URL}/enrollments`, {
                 studentName: name,
                 studentEmail: email,
                 courseOfInterest: 'General Contact Inquiry', // Distinguishing message type
-                message: message,
+                message: message, // Sending the message content
+                studentPhone: 'N/A', // Set phone to N/A since it's not requested here
             });
 
-            toast.success('Your message has been sent successfully!');
+            toast.success('Your message has been sent successfully! We will respond shortly.');
             setName('');
             setEmail('');
             setMessage('');
@@ -47,33 +52,34 @@ const ContactPage = () => {
     };
 
     return (
-        <PublicLayout title="Contact Shafqat Ali Academy">
+        // --- BRANDING FIX: Title Updated ---
+        <PublicLayout title="Contact Al-Khalil Institute | Get in Touch">
             <div className="py-12 max-w-6xl mx-auto px-4">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8 border-b pb-4 text-center">
-                    Get in Touch
+                    Connect with Al-Khalil Institute
                 </h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     
-                    {/* 1. Static Contact Details (Trust Building) */}
+                    {/* 1. Static Contact Details (UPDATED) */}
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Direct Contact & Support</h2>
                         <div className="space-y-6 text-lg">
-                            <p className="flex items-center text-gray-700">
+                            <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center text-gray-700 hover:text-blue-600 transition-colors">
                                 <FaEnvelope className="mr-3 text-blue-600 text-2xl"/> 
-                                Email: <span className="font-medium ml-2">info@shafqataliacademy.com</span>
-                            </p>
-                            <p className="flex items-center text-gray-700">
+                                Email: <span className="font-medium ml-2">{CONTACT_EMAIL}</span>
+                            </a>
+                            <a href={`https://wa.me/${CONTACT_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-700 hover:text-green-600 transition-colors">
                                 <FaWhatsapp className="mr-3 text-green-600 text-2xl"/> 
-                                WhatsApp: <span className="font-medium ml-2">0312-0122162</span>
-                            </p>
+                                WhatsApp: <span className="font-medium ml-2">{CONTACT_WHATSAPP}</span>
+                            </a>
                             <p className="flex items-center text-gray-700">
                                 <FaMapMarkerAlt className="mr-3 text-red-600 text-2xl"/> 
                                 Location: <span className="font-medium ml-2">Karachi, Pakistan (Global Online Service)</span>
                             </p>
                         </div>
                         <p className="mt-8 text-md text-gray-600">
-                            For course enrollment, please use the **Enroll Now** button or the dedicated **Counselling** page.
+                            For course enrollment or career guidance, please use the dedicated **Enrollment** or **Counselling** pages for faster service.
                         </p>
                     </div>
 
