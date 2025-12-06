@@ -33,20 +33,21 @@ const CourseDetailPage = ({ course }) => {
         "description": course.description,
         "provider": {
             "@type": "Organization",
-            "name": "Shafqat Ali Academy",
-            "sameAs": "http://localhost:3000" 
+            "name": "Al-Khalil Institute",  // <--- UPDATED NAME
+            "sameAs": "https://www.alkhalilinstitute.org" // <--- UPDATED URL
         },
         "offers": {
             "@type": "Offer",
             "price": course.price,
-            "priceCurrency": "USD",
+            "priceCurrency": "PKR",
             "availability": "https://schema.org/InStock",
         }
     };
 
     return (
         // Use the course title and description for specific SEO on this page
-        <PublicLayout title={`${course.title} | Academy`} description={course.description}>
+        // <--- UPDATED TITLE BELOW
+        <PublicLayout title={`${course.title} | Al-Khalil Institute`} description={course.description}>
             <Head>
                 {/* Inject Course Schema JSON-LD */}
                 <script 
@@ -78,9 +79,10 @@ const CourseDetailPage = ({ course }) => {
                     <aside className="lg:col-span-1">
                         <div className="bg-white p-6 rounded-lg shadow-xl sticky top-20">
                             <img src={course.image || '/images/default-course.jpg'} alt={course.title} className="w-full rounded-md mb-4" />
-                            <h3 className="text-3xl font-bold text-green-600 mb-4">${course.price.toFixed(2)}</h3>
+                            <h3 className="text-3xl font-bold text-green-600 mb-4">PKR {course.price.toLocaleString()}</h3>
                             
-                            <a href="/contact" className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">
+                            {/* Updated link to point to your Enrollment Wizard if needed, otherwise kept as /contact */}
+                            <a href="/enroll" className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">
                                 Enroll Now!
                             </a>
                             <p className="mt-4 text-sm text-center text-gray-500">
