@@ -5,7 +5,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 const WhatsAppIcon = () => {
     // IMPORTANT: Replace this with your actual WhatsApp contact number
-    const whatsappNumber = '923452494059'; 
+    const whatsappNumber = '923481631827'; 
     const message = encodeURIComponent('Assalam-o-Alaikum! I have a question about the Shafqat Ali Academy courses and need assistance.');
 
     const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
