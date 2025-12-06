@@ -2,32 +2,33 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useMutation } from '@tanstack/react-query'; // Makes 'useMutation' available
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import PublicLayout from '@/layouts/PublicLayout'; // The import we fixed last time
+import PublicLayout from '@/layouts/PublicLayout';
 import Link from 'next/link';
 
-// Define the API URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 const ResetPasswordPage = () => {
-    // --- 1. HOOKS & STATE ---
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
 
-    // Get the token from the URL query parameters
     const { token } = router.query;
 
-    // --- 2. API MUTATION (This is the missing part!) ---
-    // This line defines the 'mutation' variable
     const mutation = useMutation({
         mutationFn: (passwords) => {
             if (!token) {
+                // This will happen if the page loads before the router is ready
+                toast.error('No reset token found. Please use the link from your email.');
                 throw new Error('No reset token found.');
             }
-            return axios.patch(`${API_URL}/users/reset-password/${token}`, passwords);
+            
+            // --- THIS IS THE FIX ---
+            // We change .patch to .put to match our backend route
+            return axios.put(`${API_URL}/users/reset-password/${token}`, passwords);
+            // --- END OF FIX ---
         },
         onSuccess: () => {
             toast.success('Password has been reset successfully! Please log in.');
@@ -41,7 +42,6 @@ const ResetPasswordPage = () => {
         },
     });
 
-    // --- 3. FORM SUBMIT HANDLER ---
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -53,10 +53,10 @@ const ResetPasswordPage = () => {
             toast.error('Password must be at least 6 characters long.');
             return;
         }
-        mutation.mutate({ password, confirmPassword });
+        // We only need to send the new password
+        mutation.mutate({ password });
     };
 
-    // --- 4. JSX (The Form) ---
     return (
         <PublicLayout title="Reset Your Password - Shafqat Ali Academy">
             <div className="flex justify-center items-center py-12 px-4">
@@ -105,7 +105,7 @@ const ResetPasswordPage = () => {
                                         required
                                         className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm"
                                     />
-                                </div> {/* This is the div that was broken before */}
+                                </div>
 
                                 <div>
                                     <button

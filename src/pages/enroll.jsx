@@ -1,4 +1,4 @@
-// frontend/src/pages/enroll.jsx (FULL CODE - Multi-Step Enrollment)
+// frontend/src/pages/enroll.jsx (UPGRADED with dynamic courses)
 
 import { useState } from 'react';
 import PublicLayout from '@/layouts/PublicLayout';
@@ -7,15 +7,14 @@ import { toast } from 'react-toastify';
 import { FaUser, FaBookOpen, FaCheckCircle, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import Link from 'next/link';
 
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-const EnrollPage = () => {
+// The page component now receives 'courses' as a prop
+const EnrollPage = ({ courses = [] }) => { 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    // Consolidated state for all form data
     const [formData, setFormData] = useState({
         studentName: '',
         studentEmail: '',
@@ -60,19 +59,18 @@ const EnrollPage = () => {
         setLoading(true);
 
         try {
-            // Submission structure matches your existing /api/enrollments endpoint
             await axios.post(`${API_URL}/enrollments`, {
                 studentName: formData.studentName,
                 studentEmail: formData.studentEmail,
                 studentPhone: formData.studentPhone,
                 studentCategory: formData.studentCategory,
                 courseOfInterest: formData.courseOfInterest,
-                message: formData.motivation, // Using motivation field as the main message
+                message: formData.motivation, 
             });
 
             toast.success('Enrollment request submitted successfully! Check your email for confirmation.');
             setIsSubmitted(true);
-            setFormData({ // Clear state after successful submission
+            setFormData({
                 studentName: '', studentEmail: '', studentPhone: '', studentCategory: '', 
                 courseOfInterest: '', motivation: '', agreeConsent: false,
             });
@@ -130,15 +128,17 @@ const EnrollPage = () => {
                     <div className="space-y-6">
                         <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Step 2: Course Selection & Goals</h2>
                         
-                        {/* Course of Interest */}
+                        {/* Course of Interest - NOW DYNAMIC */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Course of Interest *</label>
-                            {/* NOTE: In a production setting, this list would be dynamically fetched from the Course API */}
                             <select name="courseOfInterest" value={formData.courseOfInterest} onChange={handleChange} required className="mt-1 block w-full p-3 border rounded-md bg-white">
                                 <option value="">-- Select a Course --</option>
-                                <option value="Full-Stack MERN Mastery">Full-Stack MERN Mastery</option>
-                                <option value="Next.js SEO Masterclass">Next.js SEO Masterclass</option>
-                                <option value="O-Level Islamiyat (2058) Prep">O-Level Islamiyat (2058) Prep</option>
+                                {/* Loop over the courses prop */}
+                                {courses.map(course => (
+                                    <option key={course._id} value={course.title}>
+                                        {course.title}
+                                    </option>
+                                ))}
                                 <option value="Academic Counseling">Academic Counseling (if unsure)</option>
                             </select>
                         </div>
@@ -235,5 +235,27 @@ const EnrollPage = () => {
         </PublicLayout>
     );
 };
+
+// --- NEW CODE ADDED ---
+// We fetch the list of published courses on the server
+export async function getServerSideProps() {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    let courses = [];
+
+    try {
+        const coursesResponse = await fetch(`${API_URL}/courses`);
+        if (coursesResponse.ok) {
+            courses = await coursesResponse.json();
+        }
+    } catch (error) {
+        console.error('Error fetching courses for enroll page:', error.message);
+    }
+
+    return {
+        props: {
+            courses, // Pass the courses to the page
+        },
+    };
+}
 
 export default EnrollPage;

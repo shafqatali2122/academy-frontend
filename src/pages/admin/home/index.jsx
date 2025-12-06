@@ -1,4 +1,4 @@
-// frontend/src/pages/admin/home/index.jsx (FINAL CODE WITH LABELS)
+// frontend/src/pages/admin/home/index.jsx (FIXED)
 
 import AdminLayout from '@/layouts/AdminLayout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,8 +27,8 @@ const HomeConfigPage = () => {
     const { user } = useAuth();
     const token = user?.token;
 
-    const [config, setConfig] = useState(null);
-    const [openPanel, setOpenPanel] = useState('hero'); // Control which panel is open
+    const [config, setConfig] = useState(null); // Start as null
+    const [openPanel, setOpenPanel] = useState('hero');
 
     const getConfig = () => ({ headers: { Authorization: `Bearer ${token}` } });
 
@@ -42,26 +42,45 @@ const HomeConfigPage = () => {
         enabled: !!token,
     });
 
-    // Load initial config state when data arrives (or set safe defaults)
+    // --- ⬇️ THIS IS THE FIX ⬇️ ---
+
+    // Define safe defaults for ALL sections
+    const defaultConfig = {
+        hero: { enabled: true, title: "Welcome", subtitle: "", ctaText: "Courses", ctaHref: "/courses", bgImageUrl: "" },
+        announcement: { enabled: false, text: "", href: "" },
+        coursesShowcase: { enabled: true, heading: "Featured Courses", limit: 3 },
+        mediaGallery: { enabled: true, heading: "Media Gallery", youtubeIds: [] },
+        blogSpotlight: { enabled: true, heading: "Latest Blogs", limit: 3 },
+        ownerSection: { enabled: true, heading: "Meet the Instructor", bio: "", avatarUrl: "" },
+        donate: { enabled: false, text: "", donateHref: "" },
+        joinTeam: { enabled: false, text: "", joinHref: "" }
+        // Note: 'testimonials' was in your old defaults but not in the DB model, so it's removed.
+    };
+
+    // Load initial config state when data arrives
     useEffect(() => {
         if (initialConfig) {
-            setConfig(initialConfig);
-        } else if (initialConfig === null) {
-            // Set defaults if no document exists yet
-             setConfig({
-                hero: { enabled: true, title: "Master Full-Stack Development with Expert Guidance", subtitle: "Academic Authority meets Professional Pedagogy.", ctaText: "View Course Catalog", ctaHref: "/courses", bgImageUrl: "/images/hero-default.jpg" },
-                announcement: { enabled: false, text: "New Course enrollment is open!", href: "/contact" },
-                testimonials: { enabled: true, items: [] },
-                coursesShowcase: { enabled: true, heading: "Our Featured Programs", limit: 3 },
-                mediaGallery: { enabled: true, heading: "Session Highlights & Expert Tips", youtubeIds: [] },
-                blogSpotlight: { enabled: true, heading: "Latest Insights from Our Scholars", limit: 3 },
-                ownerSection: { enabled: true, heading: "Meet Your Instructor: Shafqat Ali", bio: "M.Phil Scholar, Cambridge Certified Educator, and Founder.", avatarUrl: "/images/owner-avatar.jpg" },
-                donate: { enabled: false, text: "Help us sponsor a student’s entire course fees.", donateHref: "/donate" },
-                joinTeam: { enabled: true, text: "Join our mission. Become a part of our expert teaching team.", joinHref: "/contact?subject=Teaching%20Opportunity" }
+            // Merge defaults with fetched config to prevent undefined errors
+            setConfig({
+                // Start with defaults
+                ...defaultConfig,
+                // Merge fetched top-level data (_id, etc.)
+                ...initialConfig, 
+                
+                // Deep merge nested objects
+                hero: { ...defaultConfig.hero, ...initialConfig.hero },
+                announcement: { ...defaultConfig.announcement, ...initialConfig.announcement },
+                coursesShowcase: { ...defaultConfig.coursesShowcase, ...initialConfig.coursesShowcase },
+                mediaGallery: { ...defaultConfig.mediaGallery, ...initialConfig.mediaGallery },
+                blogSpotlight: { ...defaultConfig.blogSpotlight, ...initialConfig.blogSpotlight },
+                ownerSection: { ...defaultConfig.ownerSection, ...initialConfig.ownerSection },
+                donate: { ...defaultConfig.donate, ...initialConfig.donate },
+                joinTeam: { ...defaultConfig.joinTeam, ...initialConfig.joinTeam },
             });
         }
     }, [initialConfig]);
 
+    // --- ⬆️ END OF FIX ⬆️ ---
 
     // 2. UPDATE: Mutation for saving changes
     const updateMutation = useMutation({
@@ -86,7 +105,10 @@ const HomeConfigPage = () => {
         }));
     };
 
-    if (isLoading || !config) return <AdminLayout><div>Loading Homepage Configuration...</div></AdminLayout>;
+    // Show loading screen until config is merged and ready
+    if (isLoading || !config) {
+        return <AdminLayout><div>Loading Homepage Configuration...</div></AdminLayout>;
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -94,7 +116,6 @@ const HomeConfigPage = () => {
         const { _id, createdAt, updatedAt, __v, ...dataToSend } = config; 
         updateMutation.mutate(dataToSend);
     };
-
 
     return (
         <AdminLayout>
@@ -202,7 +223,7 @@ const HomeConfigPage = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Video IDs List</label>
                         <YoutubeIdManager
-                            youtubeIds={config.mediaGallery.youtubeIds || []}
+                            youtubeIds={config.mediaGallery.youtubeIds || []} // Pass empty array if undefined
                             onChange={(newIds) => handleInputChange('mediaGallery', 'youtubeIds', newIds)}
                         />
                         <p className="text-sm text-gray-500 mt-2">

@@ -1,3 +1,5 @@
+// frontend/src/pages/register.jsx
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,57 +9,57 @@ import { toast } from 'react-toastify';
 import { useAuth } from '@/utils/context/AuthContext';
 import PublicLayout from '@/layouts/PublicLayout';
 
-// Define the API URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+};
+
 const RegisterPage = () => {
-    // --- 1. HOOKS & STATE ---
-    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const router = useRouter();
-    const { user, login, isLoading: isAuthLoading } = useAuth();
+    // --- UPDATED to get handleLoginSuccess ---
+    const { user, handleLoginSuccess, isLoading: isAuthLoading } = useAuth();
 
-    // --- 2. REDIRECT IF ALREADY LOGGED IN ---
     useEffect(() => {
-        // If auth is not loading and the user is already logged in,
-        // redirect them away from the register page.
         if (!isAuthLoading && user) {
-            router.replace('/dashboard/profile'); // or wherever your main dashboard is
+            if (user.role === 'User') {
+                router.replace('/my-dashboard');
+            } else {
+                router.replace('/admin/dashboard');
+            }
         }
     }, [user, isAuthLoading, router]);
 
-    // --- 3. API MUTATION (using React Query) ---
     const registerMutation = useMutation({
         mutationFn: (newUserData) => {
-            // This function makes the API call
             return axios.post(`${API_URL}/users/register`, newUserData);
         },
         onSuccess: (response) => {
-            // This runs if the API call is successful
             toast.success('Registration successful! Logging you in...');
             
-            // Automatically log the user in with the data from the backend
-            // (Your backend must return { ...user, token, role })
-            login(response.data);
-
-            // The useEffect hook will now see the `user` object 
-            // and automatically redirect to the dashboard.
+            // --- THIS IS THE FIX ---
+            // We now call the smart function from our context
+            handleLoginSuccess(response.data);
+            // --- END OF FIX ---
         },
         onError: (error) => {
-            // This runs if the API call fails
             const message = error.response?.data?.message || 'Registration failed. Please try again.';
             toast.error(message);
         },
     });
 
-    // --- 4. FORM SUBMIT HANDLER ---
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Basic client-side validation
+        if (!validateEmail(email)) {
+            toast.error('Please enter a valid email address.');
+            return;
+        }
         if (password !== confirmPassword) {
             toast.error('Passwords do not match!');
             return;
@@ -66,12 +68,9 @@ const RegisterPage = () => {
             toast.error('Password must be at least 6 characters long.');
             return;
         }
-
-        // Call the mutation to register the user
-        registerMutation.mutate({ name, email, password });
+        registerMutation.mutate({ username, email, password });
     };
 
-    // --- 5. JSX (The Form) ---
     return (
         <PublicLayout title="Sign Up - Shafqat Ali Academy">
             <div className="flex justify-center items-center py-12 px-4">
@@ -81,26 +80,20 @@ const RegisterPage = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label 
-                                htmlFor="name" 
-                                className="block text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                 Full Name
                             </label>
                             <input
                                 type="text"
                                 id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 required
                                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm"
                             />
                         </div>
                         <div>
-                            <label 
-                                htmlFor="email" 
-                                className="block text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email Address
                             </label>
                             <input
@@ -113,10 +106,7 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div>
-                            <label 
-                                htmlFor="password" 
-                                className="block text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
                             <input
@@ -129,10 +119,7 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div>
-                            <label 
-                                htmlFor="confirmPassword" 
-                                className="block text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                                 Confirm Password
                             </label>
                             <input

@@ -1,4 +1,4 @@
-// frontend/src/pages/index.jsx (FINAL, CORRECTED CODE)
+// frontend/src/pages/index.jsx 
 
 import PublicLayout from '@/layouts/PublicLayout';
 import Link from 'next/link';
@@ -8,9 +8,22 @@ import Head from 'next/head';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 const HomePage = ({ config, courses }) => {
-    // Default fallback values if the server fetch fails
-    const defaultHero = { title: "Welcome", subtitle: "Building Digital Excellence", ctaText: "Start Learning", ctaHref: "/courses" };
-    const hero = config?.hero || defaultHero;
+    // --- ⬇️ THIS IS THE FIX ⬇️ ---
+
+    // 1. Define the default values for the hero section
+    const defaultHero = { 
+      title: "Welcome", 
+      subtitle: "Building Digital Excellence", 
+      ctaText: "Start Learning", 
+      ctaHref: "/courses",
+      enabled: true 
+    };
+    
+    // 2. Merge the default values with the config (if it exists)
+    // This ensures hero.ctaHref is NEVER undefined.
+    const hero = { ...defaultHero, ...(config?.hero) };
+
+    // --- ⬆️ END OF FIX ⬆️ ---
 
     return (
         <PublicLayout title={`Home - ${hero.title}`} description={hero.subtitle}>
@@ -55,7 +68,7 @@ const HomePage = ({ config, courses }) => {
                 <section className="py-16 max-w-7xl mx-auto px-4">
                     <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{config.coursesShowcase.heading}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {courses.slice(0, config.coursesShowcase.limit).map((course) => (
+                        {courses.slice(0, config.coursesShowcase.limit || 3).map((course) => ( // Added default limit
                             <div key={course._id} className="bg-gray-50 p-6 rounded-lg shadow-md">
                                 <h3 className="text-xl font-semibold text-blue-700 mb-2">{course.title}</h3>
                                 <p className="text-sm text-gray-600 line-clamp-3">{course.description}</p>
@@ -67,7 +80,7 @@ const HomePage = ({ config, courses }) => {
             )}
             
             {/* 5. MEDIA GALLERY (Dynamic Content) */}
-            {config?.mediaGallery?.enabled && config.mediaGallery.youtubeIds.length > 0 && (
+            {config?.mediaGallery?.enabled && config.mediaGallery.youtubeIds?.length > 0 && (
                 <section className="py-16 bg-gray-100">
                     <div className="max-w-7xl mx-auto px-4">
                         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{config.mediaGallery.heading}</h2>
@@ -94,7 +107,7 @@ const HomePage = ({ config, courses }) => {
                 <section className="py-12 bg-blue-700 text-white text-center">
                     <div className="max-w-4xl mx-auto px-4">
                         <h2 className="text-2xl font-bold mb-4">{config.joinTeam.text}</h2>
-                        <Link href={config.joinTeam.joinHref} className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-gray-100 transition-colors shadow-lg">
+                        <Link href={config.joinTeam.joinHref || '#'} className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-gray-100 transition-colors shadow-lg">
                             Be A Part of Our Team
                         </Link>
                     </div>
@@ -117,23 +130,24 @@ export async function getServerSideProps() {
         // Fetch 2: Published Courses
         const coursesResponse = await fetch(`${API_URL}/courses`);
         const allCourses = coursesResponse.ok ? await coursesResponse.json() : [];
-        const courses = allCourses.filter(c => c.isPublished);
+        
+        // We filter on the server now
+        const courses = allCourses.filter(c => c.isPublished); 
 
         return {
             props: {
                 config,
                 courses,
-                blogs: [], 
+                // blogs: [], // Removed as it wasn't being fetched
             },
         };
     } catch (error) {
-        // This log will confirm if the SSR fetch is still crashing/failing
         console.error('CRITICAL SSR FETCH ERROR:', error.message);
         return {
             props: {
                 config: {}, // Return empty defaults to prevent frontend crash
                 courses: [],
-                blogs: [],
+                // blogs: [],
             },
         };
     }
