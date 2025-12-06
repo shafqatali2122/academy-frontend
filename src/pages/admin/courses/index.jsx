@@ -183,7 +183,8 @@ const CoursesPage = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <Link
-                                        href={`/admin/courses/${course._id}`} // FIXED LINK HERE
+                                        // --- FIXED LINK HERE: ADDED /edit ---
+                                        href={`/admin/courses/${course._id}/edit`}
                                         className="text-indigo-600 hover:text-indigo-900 mr-4"
                                     >
                                         <FaEdit />
