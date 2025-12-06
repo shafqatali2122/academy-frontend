@@ -17,42 +17,53 @@ const CoursesPage = () => {
     const queryClient = useQueryClient();
     const { user } = useAuth();
 
-    // ✅ Add filter state
+    // Filter state
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all'); // <-- NEW STATE
+    const [filterStatus, setFilterStatus] = useState('all');
 
-    // ✅ Data Fetching (READ)
+    // ✅ Data Fetching (READ) - UPDATED TO FETCH "ALL" COURSES
     const { data: courses, isLoading, isError, error } = useQuery({
         queryKey: ['courses'],
         queryFn: async () => {
-            const { data } = await axios.get(`${API_URL}/courses`);
+            // 1. Get Token safely
+            const token = user?.token || JSON.parse(localStorage.getItem('userInfo'))?.token;
+            
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, // <--- Attach Token
+                },
+            };
+
+            // 2. Fetch from the ADMIN route (/all) instead of the public route
+            const { data } = await axios.get(`${API_URL}/courses/all`, config);
             return data;
         },
+        enabled: true, // Run immediately
     });
 
-    // ✅ Client-side filtering with search and publish status
+    // Client-side filtering
     const filteredCourses =
         courses?.filter((course) => {
             const matchesSearch =
                 course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 course.slug.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // Apply Status Filtering: Published (Active) or Unpublished (Inactive)
             if (filterStatus === 'published') {
                 return matchesSearch && course.isPublished;
             }
             if (filterStatus === 'unpublished') {
                 return matchesSearch && !course.isPublished;
             }
-            return matchesSearch; // 'all' status
+            return matchesSearch;
         }) || [];
 
     // ✅ Data Deletion (DELETE)
     const deleteMutation = useMutation({
         mutationFn: async (courseId) => {
+            const token = user?.token || JSON.parse(localStorage.getItem('userInfo'))?.token;
             const config = {
                 headers: {
-                    Authorization: `Bearer ${user.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             };
             await axios.delete(`${API_URL}/courses/${courseId}`, config);
@@ -72,11 +83,20 @@ const CoursesPage = () => {
         }
     };
 
-    // ✅ Loading / Error states
+    // Loading / Error states
     if (isLoading) return <AdminLayout><div>Loading Courses...</div></AdminLayout>;
-    if (isError) return <AdminLayout><div className="text-red-500">Error: {error.message}</div></AdminLayout>;
+    
+    // Improved Error Message
+    if (isError) return (
+        <AdminLayout>
+            <div className="text-red-500 p-4 border border-red-200 bg-red-50 rounded">
+                <strong>Error:</strong> {error.response?.data?.message || error.message} <br/>
+                Try logging out and logging back in.
+            </div>
+        </AdminLayout>
+    );
 
-    // ✅ MAIN RENDER
+    // MAIN RENDER
     return (
         <AdminLayout>
             <div className="flex justify-between items-center mb-6">
@@ -89,12 +109,10 @@ const CoursesPage = () => {
                 </Link>
             </div>
 
-            {/* ✅ Total count display */}
             <div className="text-sm text-gray-600 mb-4 font-semibold">
                 Total {courses?.length || 0} Courses Found
             </div>
 
-            {/* ✅ Search and Filters */}
             <div className="flex justify-between items-center mb-4">
                 <SearchBar
                     searchTerm={searchTerm}
@@ -102,7 +120,6 @@ const CoursesPage = () => {
                     placeholder="Search courses by title or slug..."
                 />
 
-                {/* ✅ NEW FILTER RADIO BUTTONS */}
                 <div className="flex space-x-3 text-sm font-medium text-gray-700">
                     <label className="flex items-center cursor-pointer">
                         <input
@@ -140,23 +157,14 @@ const CoursesPage = () => {
                 </div>
             </div>
 
-            {/* ✅ Courses Table */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Title
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Price
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Published
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Published</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -166,22 +174,16 @@ const CoursesPage = () => {
                                     {course.title}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    ${course.price ? course.price.toFixed(2) : '0.00'}
+                                    PKR {course.price ? course.price.toLocaleString() : '0'}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span
-                                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            course.isPublished
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
-                                        }`}
-                                    >
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${course.isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                         {course.isPublished ? 'Yes' : 'No'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <Link
-                                        href={`/admin/courses/${course._id}/edit`}
+                                        href={`/admin/courses/${course._id}`} // FIXED LINK HERE
                                         className="text-indigo-600 hover:text-indigo-900 mr-4"
                                     >
                                         <FaEdit />
@@ -198,15 +200,6 @@ const CoursesPage = () => {
                         ))}
                     </tbody>
                 </table>
-
-                {/* ✅ Empty state */}
-                {filteredCourses.length === 0 && (
-                    <div className="p-6 text-center text-gray-500">
-                        {searchTerm
-                            ? 'No results found for your search criteria.'
-                            : 'No courses found. Add a new one to begin.'}
-                    </div>
-                )}
             </div>
         </AdminLayout>
     );

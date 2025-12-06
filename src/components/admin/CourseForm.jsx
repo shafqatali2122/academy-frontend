@@ -5,7 +5,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
-import { useAuth } from '@/utils/context/AuthContext';
 import { FaSave, FaTimesCircle } from 'react-icons/fa';
 import TextEditor from '@/components/common/TextEditor';
 
@@ -16,7 +15,6 @@ const slugify = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace
 const CourseForm = ({ courseData = {} }) => {
     const queryClient = useQueryClient();
     const router = useRouter();
-    const { user } = useAuth();
     
     // Check if we are in Edit mode (if courseData has an _id)
     const isEditMode = !!courseData._id;
@@ -28,9 +26,9 @@ const CourseForm = ({ courseData = {} }) => {
     const [fullContent, setFullContent] = useState(courseData.fullContent || '');
     const [price, setPrice] = useState(courseData.price?.toString() || '0');
     const [isPublished, setIsPublished] = useState(courseData.isPublished || false);
-    const [image, setImage] = useState(courseData.image || ''); // Currently placeholder for URL
+    const [image, setImage] = useState(courseData.image || ''); 
 
-    // Update slug when title changes, but only if it's a new course or slug hasn't been manually edited
+    // Update slug when title changes
     useEffect(() => {
         if (!isEditMode && title && !slug) {
             setSlug(slugify(title));
@@ -40,10 +38,17 @@ const CourseForm = ({ courseData = {} }) => {
     // 2. MUTATION SETUP (Handles both Create and Update)
     const mutation = useMutation({
         mutationFn: async (formData) => {
+            // --- FIX: Get Token directly from Storage ---
+            // This guarantees we have the token even if the page was just refreshed
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const token = userInfo?.token;
+
+            if (!token) throw new Error('You are not authorized. Please login again.');
+
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${user.token}`,
+                    Authorization: `Bearer ${token}`, // <--- Attached Token
                 },
             };
 
@@ -117,21 +122,20 @@ const CourseForm = ({ courseData = {} }) => {
             </div>
 
             {/* Full Content */}
-        <div>
-            <label htmlFor="fullContent" className="block text-sm font-medium text-gray-700">Full Course Content (Rich Text Editor) <span className="text-red-500">*</span></label>
-            {/* NEW: Use the TextEditor component */}
-            <TextEditor 
-                value={fullContent}
-                onChange={setFullContent}
-                placeholder="Enter detailed course curriculum and structure here..."
-            />
-        </div>
+            <div>
+                <label htmlFor="fullContent" className="block text-sm font-medium text-gray-700">Full Course Content (Rich Text Editor) <span className="text-red-500">*</span></label>
+                <TextEditor 
+                    value={fullContent}
+                    onChange={setFullContent}
+                    placeholder="Enter detailed course curriculum and structure here..."
+                />
+            </div>
 
             {/* Price and Image */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price ($)</label>
-                    <input type="number" id="price" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="0.01" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price (PKR)</label>
+                    <input type="number" id="price" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="1" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
                 </div>
                 <div>
                     <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image URL (Placeholder)</label>
