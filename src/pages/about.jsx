@@ -12,16 +12,17 @@ const AboutPage = () => {
                 
                 <section className="text-lg space-y-6 text-gray-700">
                     <p>
-                        The **Al-Khalil Institute** was founded by scholar and educator **Shafqat Ali** to address a critical gap in modern education: the need for teachers who possess both the **deep, authentic knowledge** (*Ilm*) of traditional Islamic scholarship and the specialized skills required to excel in the **Cambridge Assessment International Education (CAIE)** system.
+                        The <strong className="text-gray-900">Al-Khalil Institute</strong> was founded by scholar and educator <strong className="text-gray-900">Shafqat Ali</strong> to address a critical gap in modern education: the need for teachers who possess both the <strong className="text-gray-900">deep, authentic knowledge</strong> (<em className="italic">Ilm</em>) of traditional Islamic scholarship and the specialized skills required to excel in the <strong className="text-gray-900">Cambridge Assessment International Education (CAIE)</strong> system.
                     </p>
                     <p>
-                        We specialize exclusively in professional development, offering rigorous training that transforms *Ulama* (Dars-e-Nizami graduates) and Islamic Studies professionals into highly competent **O-Levels Islamiyat (2058)** teachers. Our goal is to ensure that the next generation receives authentic Islamic education delivered with modern teaching methodologies.
+                        We specialize exclusively in professional development, offering rigorous training that transforms <em className="italic">Ulama</em> (Dars-e-Nizami graduates) and Islamic Studies professionals into highly competent <strong className="text-gray-900">O-Levels Islamiyat (2058)</strong> teachers. Our goal is to ensure that the next generation receives authentic Islamic education delivered with modern teaching methodologies.
                     </p>
                     <p className="font-semibold text-blue-700">
-                        We believe that the most valuable teachers are those who can successfully bridge these two worlds—the *Madrasah* and the modern classroom.
+                        We believe that the most valuable teachers are those who can successfully bridge these two worlds—the <em className="italic">Madrasah</em> and the modern classroom.
                     </p>
                 </section>
 
+                {/* Statistics / Value Propositions */}
                 <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     <div className="p-5 bg-blue-50 rounded-lg shadow-md">
                         <h3 className="text-4xl font-extrabold text-blue-600">Dars-e-Nizami</h3>
@@ -50,7 +51,7 @@ const AboutPage = () => {
                         </div>
                         <div className="md:w-3/4 text-gray-700 space-y-4">
                             <p>
-                                Shafqat Ali is an acclaimed Imam, a dedicated **M.Phil Scholar in Islamic Learning (Karachi University)**, and the driving force behind Al-Khalil Institute. With years of experience serving as an Imam, he deeply understands the community's need for authentic religious teaching.
+                                Shafqat Ali is an acclaimed Imam, a dedicated <strong className="text-gray-900">M.Phil Scholar in Islamic Learning (Karachi University)</strong>, and the driving force behind Al-Khalil Institute. With years of experience serving as an Imam, he deeply understands the community's need for authentic religious teaching.
                             </p>
                             <p>
                                 His vision is rooted in transforming the teaching landscape by providing rigorous training that is both academically sound and ethically grounded. He continues to teach, ensuring the institute's programs remain relevant and impactful.
