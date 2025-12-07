@@ -19,7 +19,8 @@ const Footer = () => {
                     <div>
                         <h3 className="text-xl font-bold text-blue-400 mb-4">Al-Khalil Institute</h3>
                         <p className="text-sm text-gray-400">
-                            Our mission is to empower Ulama and scholars with specialized pedagogical skills to excel in teaching **Cambridge O-Levels Islamiyat (2058)**.
+                            {/* REMOVED ** */}
+                            Our mission is to empower Ulama and scholars with specialized pedagogical skills to excel in teaching Cambridge O-Levels Islamiyat (2058).
                         </p>
                     </div>
 
@@ -38,11 +39,9 @@ const Footer = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Support</h3>
                         <ul className="space-y-2 text-sm">
-                            {/* Changed Enroll Today to Counselling */}
                             <li><Link href="/counselling" className="text-gray-400 hover:text-white transition-colors">Free Counselling</Link></li>
                             <li><Link href="/admin/login" className="text-gray-400 hover:text-white transition-colors">Admin Login</Link></li>
                             <li><Link href="/faq" className="text-gray-400 hover:text-white transition-colors">FAQs</Link></li>
-                            {/* Added new link to Enroll Page */}
                             <li><Link href="/enroll" className="text-blue-400 hover:text-white font-semibold transition-colors">Enroll Now</Link></li>
                         </ul>
                     </div>
@@ -63,7 +62,8 @@ const Footer = () => {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-gray-700 text-center text-sm text-gray-500">
-                    &copy; {currentYear} **Al-Khalil Institute**. All rights reserved.
+                    {/* REMOVED ** */}
+                    &copy; {currentYear} Al-Khalil Institute. All rights reserved.
                 </div>
             </div>
         </footer>

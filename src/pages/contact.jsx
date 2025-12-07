@@ -23,6 +23,7 @@ const ContactPage = () => {
         e.preventDefault();
         setLoading(true);
 
+        // Validation uses the state variables which are tied to the inputs
         if (!name || !email || !message) {
             toast.error('Name, Email, and Message fields are required.');
             setLoading(false);
@@ -61,7 +62,7 @@ const ContactPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     
-                    {/* 1. Static Contact Details (UPDATED) */}
+                    {/* 1. Static Contact Details */}
                     <div>
                         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Direct Contact & Support</h2>
                         <div className="space-y-6 text-lg">
@@ -88,9 +89,10 @@ const ContactPage = () => {
                         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Send a Quick Message</h2>
                         <form onSubmit={submitHandler} className="space-y-4 p-6 bg-gray-50 rounded-lg shadow-md">
                             
-                            <div><input type="text" placeholder="Your Full Name *" value={name} onChange={(e) => setName(e.target.value)} required className="w-full p-3 border rounded-md" /></div>
-                            <div><input type="email" placeholder="Your Email Address *" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 border rounded-md" /></div>
-                            <div><textarea rows="4" placeholder="Your Message *" value={message} onChange={(e) => setMessage(e.target.value)} required className="w-full p-3 border rounded-md"></textarea></div>
+                            {/* REMOVED * from placeholder */}
+                            <div><input type="text" placeholder="Your Full Name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full p-3 border rounded-md" /></div>
+                            <div><input type="email" placeholder="Your Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full p-3 border rounded-md" /></div>
+                            <div><textarea rows="4" placeholder="Your Message" value={message} onChange={(e) => setMessage(e.target.value)} required className="w-full p-3 border rounded-md"></textarea></div>
 
                             <button
                                 type="submit"

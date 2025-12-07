@@ -1,8 +1,10 @@
+// frontend/src/pages/CounsellingPage.jsx
+
 import PublicLayout from '@/layouts/PublicLayout';
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaWhatsapp } from 'react-icons/fa'; // Added FaWhatsapp icon
+import { FaWhatsapp } from 'react-icons/fa';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -24,10 +26,9 @@ const CounsellingPage = () => {
             await axios.post(`${API_URL}/enrollments`, {
                 studentName: name,
                 studentEmail: email,
-                studentPhone: phone, // <-- CORRECTED FIELD NAME for Backend
+                studentPhone: phone,
                 courseOfInterest: `Counselling Request: ${subject}`,
-                studentCategory: category, // <-- CORRECTED FIELD NAME for Backend
-                // We could also send: isWhatsappContact: agreedToWhatsapp
+                studentCategory: category,
             });
             toast.success('Your counselling request has been submitted successfully! We will contact you via WhatsApp shortly.');
             
@@ -37,8 +38,6 @@ const CounsellingPage = () => {
             setPhone('');
             setCategory('');
             setSubject('');
-            // Optional: hide form after success
-            // setShowForm(false); 
 
         } catch (error) {
             console.error(error);
@@ -49,7 +48,6 @@ const CounsellingPage = () => {
     };
 
     return (
-        // --- BRANDING FIX: Changed title ---
         <PublicLayout title="Free Academic and Career Counselling | Al-Khalil Institute">
             <div className="py-12 max-w-7xl mx-auto px-4">
                 <h1 className="text-4xl font-extrabold text-gray-900 mb-6 border-b pb-3 text-center">
@@ -58,7 +56,7 @@ const CounsellingPage = () => {
 
                 <section className="text-lg space-y-6 text-gray-700 max-w-3xl mx-auto mb-10">
                     <p>
-                        The **Al-Khalil Institute** philosophy extends beyond the classroom. We understand that educational choices, career transitions, and personal development require expert, compassionate guidance—the same depth of guidance found in classical scholarship applied to modern life.
+                        The <strong className="text-gray-900">Al-Khalil Institute</strong> philosophy extends beyond the classroom. We understand that educational choices, career transitions, and personal development require expert, compassionate guidance—the same depth of guidance found in classical scholarship applied to modern life.
                     </p>
 
                     <div className="p-4 border-l-4 border-indigo-500 bg-indigo-50 italic">
@@ -97,7 +95,8 @@ const CounsellingPage = () => {
                     >
                         {/* Name */}
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name *</label>
+                            {/* REMOVED * */}
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
                             <input
                                 type="text"
                                 id="name"
@@ -110,7 +109,8 @@ const CounsellingPage = () => {
 
                         {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address *</label>
+                            {/* REMOVED * */}
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
                             <input
                                 type="email"
                                 id="email"
@@ -123,8 +123,9 @@ const CounsellingPage = () => {
 
                         {/* Phone Number */}
                         <div>
+                            {/* REMOVED * */}
                             <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                                Phone Number * (e.g., WhatsApp contact)
+                                Phone Number (e.g., WhatsApp contact)
                             </label>
                             <input
                                 type="text"
@@ -138,7 +139,8 @@ const CounsellingPage = () => {
 
                         {/* Category */}
                         <div>
-                            <label htmlFor="category" className="block text-sm font-medium text-gray-700">I am a *</label>
+                            {/* REMOVED * */}
+                            <label htmlFor="category" className="block text-sm font-medium text-gray-700">I am a</label>
                             <select
                                 id="category"
                                 value={category}
@@ -156,8 +158,9 @@ const CounsellingPage = () => {
 
                         {/* Subject */}
                         <div>
+                            {/* REMOVED * */}
                             <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                                Counselling Topic * (e.g., O-Level Islamiyat Strategy, Career Shift, Personal Development)
+                                Counselling Topic (e.g., O-Level Islamiyat Strategy, Career Shift, Personal Development)
                             </label>
                             <input
                                 type="text"
@@ -175,8 +178,8 @@ const CounsellingPage = () => {
                                 id="whatsapp"
                                 name="whatsapp"
                                 type="checkbox"
-                                checked={agreedToWhatsapp} // Use state variable
-                                onChange={(e) => setAgreedToWhatsapp(e.target.checked)} // Link to state
+                                checked={agreedToWhatsapp}
+                                onChange={(e) => setAgreedToWhatsapp(e.target.checked)}
                                 className="h-4 w-4 text-green-600 border-gray-300 rounded mt-1"
                             />
                             <label htmlFor="whatsapp" className="ml-2 block text-sm font-medium text-gray-700 flex items-center">
@@ -188,7 +191,7 @@ const CounsellingPage = () => {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={loading || !agreedToWhatsapp} // Disabled if loading OR if WhatsApp contact is unchecked
+                            disabled={loading || !agreedToWhatsapp}
                             className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white ${
                                 loading || !agreedToWhatsapp
                                     ? 'bg-indigo-400 cursor-not-allowed'
