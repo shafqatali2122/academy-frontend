@@ -1,13 +1,11 @@
-// frontend/src/layouts/PublicLayout.jsx
-
 import React from 'react';
 import Head from 'next/head'; // For SEO metadata
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import WhatsAppIcon from '@/components/common/WhatsAppIcon';
 
+// FIX: Updated default title/description to reflect Al-Khalil Institute branding
 const PublicLayout = ({ 
-    // --- BRANDING FIX: Updated default title and description ---
     title = 'Al-Khalil Institute', 
     description = 'A secure, SEO-friendly digital platform for comprehensive academic and career guidance from Al-Khalil Institute.', 
     children 
@@ -22,7 +20,7 @@ const PublicLayout = ({
                 
                 {/* General Metadata */}
                 <meta charSet="UTF-8" />
-                {/* --- FAVICON FIX: Pointing to the new SVG file --- */}
+                {/* FIX: Pointing to the new favicon.svg file */}
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
             </Head>
 
