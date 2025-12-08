@@ -104,7 +104,7 @@ const CourseDetailPage = ({ course }) => {
 
                             {/* Price */}
                             <h3 className="text-3xl font-bold text-green-600 mb-4 flex items-center">
-                                <FaDollarSign className="mr-2 text-2xl" />
+                        
                                 PKR {course.price?.toLocaleString() || 'Contact'}
                             </h3>
 
