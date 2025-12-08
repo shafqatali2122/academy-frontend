@@ -1,4 +1,4 @@
-// frontend/src/components/common/Header.jsx (FINAL FIX: SAFE ROLE-BASED DASHBOARD LINK)
+// frontend/src/components/common/Header.jsx (ALIGNMENT & SPACING FIX)
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -11,22 +11,17 @@ const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { user, logout } = useAuth();
 
-    // --- NEW, SAFER SMART NAVIGATION LOGIC ---
+    // --- NEW, SAFER SMART NAVIGATION LOGIC (Kept Unchanged) ---
     let dashboardPath = null;
 
     if (user) {
-        // 1. Define all roles that MUST go to the Admin Dashboard
         const adminRoles = [
             'SuperAdmin',
             'AdmissionsAdmin',
             'ContentAdmin',
             'AudienceAdmin',
         ];
-
-        // 2. Check if the logged-in user's role is in the admin list
         const isUserAdmin = adminRoles.includes(user.role);
-        
-        // 3. Set the dashboard path dynamically
         dashboardPath = isUserAdmin ? "/admin/dashboard" : "/my-dashboard";
     }
     // --- END NEW, SAFER SMART NAVIGATION LOGIC ---
@@ -41,7 +36,6 @@ const Header = () => {
         { name: 'Contact', path: '/contact' },
     ];
 
-    // --- Helper for mobile logout ---
     const handleMobileLogout = () => {
         logout();
         setIsOpen(false);
@@ -53,22 +47,24 @@ const Header = () => {
                 {/* Logo / Brand Name */}
                 <Link
                     href="/"
-                    className="flex items-center group"
+                    className="flex items-center group shrink-0" // shrink-0 ensures logo doesn't compress
                 >
                     <span className="text-2xl font-extrabold text-blue-800 tracking-tight hover:text-blue-900 transition-colors">
                         AL-KHALIL <span className="text-green-600">INSTITUTE</span>
                     </span>
                 </Link>
 
-                {/* --- Desktop Nav --- */}
-                <div className="hidden md:flex items-center space-x-6">
-                    {/* Main Nav Links (UNCHANGED) */}
-                    <nav className="flex space-x-6">
+                {/* --- Desktop Nav Container --- */}
+                {/* Use flex-grow and justify-end to push elements to the right */}
+                <div className="hidden md:flex flex-grow items-center justify-end space-x-4">
+                    
+                    {/* Main Nav Links - Reduced spacing to space-x-4 */}
+                    <nav className="flex space-x-4">
                         {navItems.map((item) => (
                             <Link
                                 key={item.name}
                                 href={item.path}
-                                className={`text-gray-600 hover:text-blue-700 transition-colors ${
+                                className={`text-gray-600 hover:text-blue-700 transition-colors text-sm ${ // Added text-sm to save space
                                     router.pathname === item.path
                                         ? 'font-bold text-blue-700 border-b-2 border-blue-700'
                                         : 'font-medium'
@@ -82,8 +78,7 @@ const Header = () => {
                     {/* --- AUTH SECTION (DESKTOP) --- */}
                     {user ? (
                         // User is LOGGED IN: Show Dashboard and Logout
-                        <div className="flex items-center space-x-4 border-l pl-4 border-gray-300">
-                            {/* Dashboard Link uses the safe calculated path */}
+                        <div className="flex items-center space-x-3 border-l pl-4 border-gray-300 ml-4">
                             <Link href={dashboardPath} className="flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                                 <FaUserCircle className="mr-2 text-lg" />
                                 Dashboard
@@ -97,7 +92,7 @@ const Header = () => {
                         </div>
                     ) : (
                         // User is LOGGED OUT: Show Login and Sign Up
-                        <div className="flex items-center space-x-4 border-l pl-4 border-gray-300">
+                        <div className="flex items-center space-x-3 border-l pl-4 border-gray-300 ml-4">
                             <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600">
                                 Login
                             </Link>
@@ -112,7 +107,7 @@ const Header = () => {
                     {/* Enroll Button (Desktop) */}
                     <Link
                         href="/enroll"
-                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors shadow-lg"
+                        className="inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors shadow-lg ml-4"
                     >
                         Enroll Now
                     </Link>
