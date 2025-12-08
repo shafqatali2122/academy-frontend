@@ -55,8 +55,9 @@ const EnrollPage = ({ courses = [], targetSlug }) => {
     useEffect(() => {
         // Redirect if auth data is loaded and no user is present
         if (!isAuthLoading && !user) {
-            router.replace('/login?redirect=/enroll'); 
-            toast.warn('Please log in to submit an enrollment request.');
+            // FIX: We pass the current URL to redirect back to after login
+            router.replace(`/login?redirect=${router.asPath}`); 
+            // FIX: Removed toast.warn here, the message is shown on the login page (Problem 4)
         }
     }, [user, isAuthLoading, router]);
 
@@ -235,7 +236,7 @@ const EnrollPage = ({ courses = [], targetSlug }) => {
     };
 
     return (
-        <PublicLayout title="Enrollment Wizard - Begin Your Journey">
+        <PublicLayout title="Enrollment - Al Khalil Institute">
             <div className="py-12 max-w-2xl mx-auto px-4">
                 
                 <h1 className="text-4xl font-extrabold text-gray-900 mb-8 text-center">
