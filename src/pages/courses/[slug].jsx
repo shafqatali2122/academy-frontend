@@ -1,10 +1,9 @@
-// frontend/src/pages/courses/[slug].jsx (FINAL FIX: Missing Link Import)
+// frontend/src/pages/courses/[slug].jsx (FINAL ATTEMPT: FIXED REACT.CHILDREN.ONLY ERROR)
 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-// FIX: IMPORT NEXT/LINK IS ESSENTIAL FOR CLIENT-SIDE NAVIGATION
 import Link from 'next/link'; 
 import { FaBookOpen, FaDollarSign, FaClock } from 'react-icons/fa';
 
@@ -99,11 +98,13 @@ const CourseDetailPage = ({ course }) => {
                                 </li>
                             </ul>
                             
-                            {/* FIX: Enroll Button - ensures correct linking and styling */}
-                            <Link href={`/enroll?course_slug=${course.slug}`} passHref legacyBehavior>
-                                <a className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md">
-                                    Enroll Now!
-                                </a>
+                            {/* FIX: Enroll Button - Using modern Link structure to prevent React.Children.only error */}
+                            <Link 
+                                href={`/enroll?course_slug=${course.slug}`}
+                                // Note: Removed passHref and legacyBehavior
+                                className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md"
+                            >
+                                Enroll Now!
                             </Link>
 
                             <p className="mt-4 text-sm text-center text-gray-500">
