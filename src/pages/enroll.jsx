@@ -1,35 +1,79 @@
-// frontend/src/pages/enroll.jsx (UPGRADED with dynamic courses)
+// frontend/src/pages/enroll.jsx (FINAL CORRECTED VERSION)
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
+import { useRouter } from 'next/router'; 
+import { useAuth } from '@/utils/context/AuthContext'; 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaUser, FaBookOpen, FaCheckCircle, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+// FIXED: Ensure all icons are imported here
+import { FaUser, FaBookOpen, FaCheckCircle, FaChevronRight, FaChevronLeft, FaSpinner } from 'react-icons/fa';
 import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-// The page component now receives 'courses' as a prop
-const EnrollPage = ({ courses = [] }) => { 
+// The page component now receives 'courses' and 'targetSlug' as props
+const EnrollPage = ({ courses = [], targetSlug }) => { 
+    const { user, isLoading: isAuthLoading } = useAuth();
+    const router = useRouter(); 
+
+    // Find the course based on the slug from the URL (case-insensitive find)
+    const targetCourse = courses.find(c => c.slug?.toLowerCase() === targetSlug?.toLowerCase());
+    
+    // Determine the list of courses to show: either the target course, or all courses
+    const displayCourses = targetCourse ? [targetCourse] : courses;
+    
+    // Determine the initial course selection
+    const initialCourse = targetCourse ? targetCourse.title : '';
+    
+    // Determine if the course selection should be disabled
+    const isCourseSelectionDisabled = !!targetCourse;
+
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const [formData, setFormData] = useState({
-        studentName: '',
-        studentEmail: '',
-        studentPhone: '',
-        studentCategory: '',
-        courseOfInterest: '',
-        motivation: '',
-        agreeConsent: false,
-    });
-
+    // FIXED: The steps array must be defined here inside the component
     const steps = [
         { id: 1, title: 'Your Details', icon: FaUser },
         { id: 2, title: 'Course Selection', icon: FaBookOpen },
         { id: 3, title: 'Review & Submit', icon: FaCheckCircle },
     ];
+
+    const [formData, setFormData] = useState({
+        // Pre-fill fields if user is already logged in
+        studentName: user?.username || '', 
+        studentEmail: user?.email || '', 
+        studentPhone: '',
+        studentCategory: '',
+        courseOfInterest: initialCourse, // Set initial course based on URL slug
+        motivation: '',
+        agreeConsent: false,
+    });
+
+    // --- LOGIN REDIRECT LOGIC ---
+    useEffect(() => {
+        // Redirect if auth data is loaded and no user is present
+        if (!isAuthLoading && !user) {
+            router.replace('/login?redirect=/enroll'); 
+            toast.warn('Please log in to submit an enrollment request.');
+        }
+    }, [user, isAuthLoading, router]);
+
+    // Show a loading screen while authentication status is being checked
+    if (isAuthLoading || !user) {
+        return (
+            <PublicLayout title="Checking Login Status">
+                <div className="py-20 text-center text-gray-700">
+                    <FaSpinner className="animate-spin text-4xl mx-auto mb-4 text-blue-600" />
+                    <p>Verifying your session. Redirecting to login if necessary...</p>
+                    <p className="mt-2 text-sm">You must be logged in to access the enrollment form.</p>
+                </div>
+            </PublicLayout>
+        );
+    }
+    // --- END LOGIN REDIRECT LOGIC ---
+
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -128,19 +172,31 @@ const EnrollPage = ({ courses = [] }) => {
                     <div className="space-y-6">
                         <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Step 2: Course Selection & Goals</h2>
                         
-                        {/* Course of Interest - NOW DYNAMIC */}
+                        {/* Course of Interest - FILTERED/PRE-SELECTED */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Course of Interest *</label>
-                            <select name="courseOfInterest" value={formData.courseOfInterest} onChange={handleChange} required className="mt-1 block w-full p-3 border rounded-md bg-white">
-                                <option value="">-- Select a Course --</option>
-                                {/* Loop over the courses prop */}
-                                {courses.map(course => (
+                            {/* ADDED: disabled prop and dynamic className for filtering */}
+                            <select 
+                                name="courseOfInterest" 
+                                value={formData.courseOfInterest} 
+                                onChange={handleChange} 
+                                required 
+                                disabled={isCourseSelectionDisabled}
+                                className={`mt-1 block w-full p-3 border rounded-md ${isCourseSelectionDisabled ? 'bg-gray-100 text-gray-600' : 'bg-white'}`}
+                            >
+                                {!isCourseSelectionDisabled && <option value="">-- Select a Course --</option>}
+                                {/* Loop over the DISPLAY courses (filtered or full) */}
+                                {displayCourses.map(course => (
                                     <option key={course._id} value={course.title}>
                                         {course.title}
                                     </option>
                                 ))}
-                                <option value="Academic Counseling">Academic Counseling (if unsure)</option>
+                                {/* Show Academic Counseling only if not a targeted course */}
+                                {!isCourseSelectionDisabled && <option value="Academic Counseling">Academic Counseling (if unsure)</option>}
                             </select>
+                            {targetCourse && (
+                                <p className="text-sm text-blue-600 mt-2">This course has been pre-selected for you.</p>
+                            )}
                         </div>
                         
                         {/* Motivation/Message */}
@@ -183,7 +239,7 @@ const EnrollPage = ({ courses = [] }) => {
             <div className="py-12 max-w-2xl mx-auto px-4">
                 
                 <h1 className="text-4xl font-extrabold text-gray-900 mb-8 text-center">
-                    Enrollment Wizard
+                    Enrollment
                 </h1>
 
                 {isSubmitted ? (
@@ -236,16 +292,17 @@ const EnrollPage = ({ courses = [] }) => {
     );
 };
 
-// --- NEW CODE ADDED ---
-// We fetch the list of published courses on the server
-export async function getServerSideProps() {
+// --- SERVER SIDE PROPS ---
+export async function getServerSideProps({ query }) {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     let courses = [];
+    // Capture the slug from the URL: ?course_slug=quran-tafsir
+    const targetSlug = query.course_slug || null; 
 
     try {
         const coursesResponse = await fetch(`${API_URL}/courses`);
         if (coursesResponse.ok) {
-            courses = await coursesResponse.json();
+            courses = await coursesResponse.json(); 
         }
     } catch (error) {
         console.error('Error fetching courses for enroll page:', error.message);
@@ -253,7 +310,8 @@ export async function getServerSideProps() {
 
     return {
         props: {
-            courses, // Pass the courses to the page
+            courses, 
+            targetSlug, // Pass the target slug/course identifier
         },
     };
 }
