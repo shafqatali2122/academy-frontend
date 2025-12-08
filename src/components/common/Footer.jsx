@@ -1,5 +1,3 @@
-// frontend/src/components/common/Footer.jsx
-
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
@@ -11,7 +9,7 @@ const Footer = () => {
     const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
     return (
-        <footer className="bg-gray-800 text-white mt-12 border-t-4 border-blue-600">
+        <footer className="bg-gray-800 text-white border-t-4 border-blue-600 mt-auto">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     
@@ -19,7 +17,6 @@ const Footer = () => {
                     <div>
                         <h3 className="text-xl font-bold text-blue-400 mb-4">Al-Khalil Institute</h3>
                         <p className="text-sm text-gray-400">
-                            {/* REMOVED ** */}
                             Our mission is to empower Ulama and scholars with specialized pedagogical skills to excel in teaching Cambridge O-Levels Islamiyat (2058).
                         </p>
                     </div>
@@ -50,11 +47,8 @@ const Footer = () => {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Connect</h3>
                         <div className="flex space-x-4">
-                            {/* Updated Email Link */}
                             <a href="mailto:info@alkhalilinstitute.org" className="text-gray-400 hover:text-blue-400 transition-colors" title="Email Us"><FaEnvelope className="text-xl" /></a>
-                            {/* Added WhatsApp Link */}
                             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-400 transition-colors" title="WhatsApp Chat"><FaFacebook className="text-xl" /></a>
-                            {/* Social Media (Placeholders left to be filled by you later) */}
                             <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors" title="Twitter"><FaTwitter className="text-xl" /></a>
                             <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors" title="LinkedIn"><FaLinkedin className="text-xl" /></a>
                         </div>
@@ -62,7 +56,6 @@ const Footer = () => {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-gray-700 text-center text-sm text-gray-500">
-                    {/* REMOVED ** */}
                     &copy; {currentYear} Al-Khalil Institute. All rights reserved.
                 </div>
             </div>
