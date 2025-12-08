@@ -1,11 +1,12 @@
-// frontend/src/pages/courses/[slug].jsx (FINAL LAYOUT FIX)
+// frontend/src/pages/courses/[slug].jsx (FINAL FIX: Missing Link Import)
 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+// FIX: IMPORT NEXT/LINK IS ESSENTIAL FOR CLIENT-SIDE NAVIGATION
 import Link from 'next/link'; 
-import { FaBookOpen, FaDollarSign, FaClock } from 'react-icons/fa'; // Added icons for features
+import { FaBookOpen, FaDollarSign, FaClock } from 'react-icons/fa';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -86,7 +87,7 @@ const CourseDetailPage = ({ course }) => {
                                 <FaDollarSign className="mr-2 text-2xl" /> PKR {course.price?.toLocaleString() || 'Contact'}
                             </h3>
                             
-                            {/* Features List (Optional, improves layout) */}
+                            {/* Features List */}
                             <ul className="space-y-2 mb-6 border-t pt-4 text-gray-700">
                                 <li className="flex items-center text-sm">
                                     <FaBookOpen className="mr-2 text-blue-600" />
