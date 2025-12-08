@@ -1,10 +1,11 @@
-// frontend/src/pages/courses/[slug].jsx (FINAL FIX: Course-Specific Enrollment Link)
+// frontend/src/pages/courses/[slug].jsx (FINAL LAYOUT FIX)
 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import Link from 'next/link'; // IMPORTANT: Import Link to use it in the JSX
+import Link from 'next/link'; 
+import { FaBookOpen, FaDollarSign, FaClock } from 'react-icons/fa'; // Added icons for features
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -26,7 +27,7 @@ const CourseDetailPage = ({ course }) => {
         );
     }
     
-    // SEO: Course Schema Markup (Highly important for rich results in Google)
+    // SEO: Course Schema Markup
     const courseSchema = {
         "@context": "https://schema.org",
         "@type": "Course",
@@ -46,7 +47,6 @@ const CourseDetailPage = ({ course }) => {
     };
 
     return (
-        // Use the course title and description for specific SEO on this page
         <PublicLayout title={`${course.title} | Al-Khalil Institute`} description={course.description}>
             <Head>
                 {/* Inject Course Schema JSON-LD */}
@@ -59,7 +59,6 @@ const CourseDetailPage = ({ course }) => {
             <div className="max-w-7xl mx-auto px-4 py-12">
                 {/* Course Header Section */}
                 <header className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-600">
-                    {/* H1 Tag for maximum SEO value */}
                     <h1 className="text-4xl font-extrabold text-gray-900">{course.title}</h1>
                     <p className="mt-2 text-xl text-gray-700">{course.description}</p>
                 </header>
@@ -71,22 +70,41 @@ const CourseDetailPage = ({ course }) => {
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">Full Curriculum</h2>
                         <div 
                             className="prose max-w-none text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: course.fullContent }} // Render rich HTML content
+                            dangerouslySetInnerHTML={{ __html: course.fullContent }} 
                         />
                     </div>
 
                     {/* Sidebar / CTA (1/3 width) */}
                     <aside className="lg:col-span-1">
                         <div className="bg-white p-6 rounded-lg shadow-xl sticky top-20">
-                            <img src={course.image || '/images/default-course.jpg'} alt={course.title} className="w-full rounded-md mb-4" />
-                            <h3 className="text-3xl font-bold text-green-600 mb-4">PKR {course.price.toLocaleString()}</h3>
                             
-                            {/* FIX: Use Link component and pass the course.slug to the enroll page */}
-                            <Link href={`/enroll?course_slug=${course.slug}`} passHref>
-                                <a className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">
+                            {/* Course Image */}
+                            <img src={course.image || '/images/default-course.jpg'} alt={course.title} className="w-full rounded-md mb-4" />
+                            
+                            {/* Price */}
+                            <h3 className="text-3xl font-bold text-green-600 mb-4 flex items-center">
+                                <FaDollarSign className="mr-2 text-2xl" /> PKR {course.price?.toLocaleString() || 'Contact'}
+                            </h3>
+                            
+                            {/* Features List (Optional, improves layout) */}
+                            <ul className="space-y-2 mb-6 border-t pt-4 text-gray-700">
+                                <li className="flex items-center text-sm">
+                                    <FaBookOpen className="mr-2 text-blue-600" />
+                                    <span>{course.modules || 10} Modules Included</span>
+                                </li>
+                                <li className="flex items-center text-sm">
+                                    <FaClock className="mr-2 text-blue-600" />
+                                    <span>Duration: {course.duration || 'Flexible'}</span>
+                                </li>
+                            </ul>
+                            
+                            {/* FIX: Enroll Button - ensures correct linking and styling */}
+                            <Link href={`/enroll?course_slug=${course.slug}`} passHref legacyBehavior>
+                                <a className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md">
                                     Enroll Now!
                                 </a>
                             </Link>
+
                             <p className="mt-4 text-sm text-center text-gray-500">
                                 Start learning immediately after registration.
                             </p>
@@ -98,30 +116,28 @@ const CourseDetailPage = ({ course }) => {
     );
 };
 
-// Fetch data on the server side using the URL slug
+// Fetch data on the server side using the URL slug (UNCHANGED)
 export async function getServerSideProps(context) {
-    const { slug } = context.params; // Get the slug from the URL: /courses/[slug]
+    const { slug } = context.params; 
 
     try {
-        // Fetch the course using the specific backend route: /api/courses/slug/:slug
         const { data } = await axios.get(`${API_URL}/courses/slug/${slug}`);
 
         return {
             props: {
-                course: data, // Pass the fetched course data
+                course: data,
             },
         };
     } catch (error) {
-        // If course not found (404), return a redirect or null data
         if (error.response && error.response.status === 404) {
             return {
-                notFound: true, // This tells Next.js to render the 404 page
+                notFound: true,
             };
         }
         console.error(`Error fetching course ${slug}:`, error.message);
         return {
             props: {
-                course: null, // Return null on error
+                course: null,
             },
         };
     }
