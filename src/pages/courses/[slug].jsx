@@ -1,4 +1,4 @@
-// frontend/src/pages/courses/[slug].jsx (FINAL ATTEMPT: FIXED REACT.CHILDREN.ONLY ERROR)
+// frontend/src/pages/courses/[slug].jsx (FINAL FIX: LAYOUT SPACING)
 
 import PublicLayout from '@/layouts/PublicLayout';
 import axios from 'axios';
@@ -12,7 +12,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 const CourseDetailPage = ({ course }) => {
     const router = useRouter();
 
-    // If data fetching failed, redirect to the 404 page (or a custom error page)
     if (router.isFallback) {
         return <PublicLayout><div>Loading course details...</div></PublicLayout>;
     }
@@ -27,7 +26,6 @@ const CourseDetailPage = ({ course }) => {
         );
     }
     
-    // SEO: Course Schema Markup
     const courseSchema = {
         "@context": "https://schema.org",
         "@type": "Course",
@@ -49,14 +47,14 @@ const CourseDetailPage = ({ course }) => {
     return (
         <PublicLayout title={`${course.title} | Al-Khalil Institute`} description={course.description}>
             <Head>
-                {/* Inject Course Schema JSON-LD */}
                 <script 
                     type="application/ld+json" 
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
                 />
             </Head>
             
-            <div className="max-w-7xl mx-auto px-4 py-12">
+            {/* FIX: Changed max-w-7xl to max-w-screen-xl and used px-6 for better spacing */}
+            <div className="max-w-screen-xl mx-auto px-6 py-12">
                 {/* Course Header Section */}
                 <header className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-600">
                     <h1 className="text-4xl font-extrabold text-gray-900">{course.title}</h1>
@@ -98,10 +96,9 @@ const CourseDetailPage = ({ course }) => {
                                 </li>
                             </ul>
                             
-                            {/* FIX: Enroll Button - Using modern Link structure to prevent React.Children.only error */}
+                            {/* Enroll Button */}
                             <Link 
                                 href={`/enroll?course_slug=${course.slug}`}
-                                // Note: Removed passHref and legacyBehavior
                                 className="w-full block text-center py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md"
                             >
                                 Enroll Now!
