@@ -1,3 +1,5 @@
+// frontend/src/components/admin/Sidebar.jsx
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/utils/context/AuthContext';
@@ -14,14 +16,24 @@ const DashboardSidebar = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
 
+  // If no user loaded, hide sidebar
+  if (!user) return null;
+
+  // --- ROLE MAPPING (NEW, but minimal and safe) ---
+  const role = user.role;
+
+  const isSuperAdmin = ['SuperAdmin', 'admin'].includes(role);
+  const isAdmissionsAdmin = ['AdmissionsAdmin'].includes(role);
+  const isContentAdmin = ['ContentAdmin', 'content_manager'].includes(role);
+  const isAudienceAdmin = ['AudienceAdmin', 'marketing_manager'].includes(role);
+  const isStudent = ['User', 'student'].includes(role);
+  // -------------------------------------------------
+
   // Logout handler
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/login'); // or '/admin/login' if that is your flow
   };
-
-  // If no user loaded, hide sidebar
-  if (!user) return null;
 
   // Helper to style active links
   const linkClass = (path) =>
@@ -36,9 +48,8 @@ const DashboardSidebar = () => {
       <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
 
       <nav className="flex-grow space-y-4">
-
-        {/* --- Admin Only Links --- */}
-        {user.role === 'admin' && (
+        {/* --- Director / System (ONLY SUPER ADMIN) --- */}
+        {isSuperAdmin && (
           <div>
             <h3 className="text-xs uppercase text-gray-400 mb-2">Director</h3>
             <Link href="/admin/users" className={linkClass('/admin/users')}>
@@ -50,8 +61,8 @@ const DashboardSidebar = () => {
           </div>
         )}
 
-        {/* --- Admin OR Content Manager Links --- */}
-        {(user.role === 'admin' || user.role === 'content_manager') && (
+        {/* --- Content (Ausaf) – SuperAdmin + ContentAdmin --- */}
+        {(isSuperAdmin || isContentAdmin) && (
           <div>
             <h3 className="text-xs uppercase text-gray-400 mb-2">Content (Ausaf)</h3>
             <Link href="/admin/blogs" className={linkClass('/admin/blogs')}>
@@ -66,8 +77,8 @@ const DashboardSidebar = () => {
           </div>
         )}
 
-        {/* --- Admin OR Marketing Manager Links --- */}
-        {(user.role === 'admin' || user.role === 'marketing_manager') && (
+        {/* --- Marketing (Sajid) – SuperAdmin + AudienceAdmin --- */}
+        {(isSuperAdmin || isAudienceAdmin) && (
           <div>
             <h3 className="text-xs uppercase text-gray-400 mb-2">Marketing (Sajid)</h3>
             <Link href="/admin/analytics" className={linkClass('/admin/analytics')}>
@@ -76,8 +87,21 @@ const DashboardSidebar = () => {
           </div>
         )}
 
-        {/* --- Student Link --- */}
-        {user.role === 'student' && (
+        {/* --- Admissions section (if you want AdmissionsAdmin to see enrollments) --- */}
+        {(isSuperAdmin || isAdmissionsAdmin || isAudienceAdmin) && (
+          <div>
+            <h3 className="text-xs uppercase text-gray-400 mb-2">Admissions</h3>
+            <Link
+              href="/admin/enrollments"
+              className={linkClass('/admin/enrollments')}
+            >
+              <FaFileAlt className="mr-3" /> Manage Enrollments
+            </Link>
+          </div>
+        )}
+
+        {/* --- Student Link (User student) --- */}
+        {isStudent && (
           <div>
             <h3 className="text-xs uppercase text-gray-400 mb-2">Student</h3>
             <Link
